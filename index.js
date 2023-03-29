@@ -1,5 +1,6 @@
 const { ApolloServer } = require("@apollo/server");
 const { startStandaloneServer } = require("@apollo/server/standalone");
+const { v1: uuid } = require("uuid");
 
 let persons = [
   {
@@ -44,6 +45,15 @@ const typeDefs = `
     allPersons: [Person!]!
     findPerson(name: String!): Person
   }
+
+  type Mutation {
+    addPerson(
+      name: String!
+      phone: String
+      street: String!
+      city: String!
+    ): Person
+  }
 `;
 
 //resolvers correspond to the queries described in the schema
@@ -63,6 +73,15 @@ const resolvers = {
         street: root.street,
         city: root.city,
       };
+    },
+  },
+  //mutation adds the object given to it as a parameter args
+  //to the array persons, and returns the object it added to the array
+  Mutation: {
+    addPerson: (root, args) => {
+      const person = { ...args, id: uuid() };
+      persons = persons.concat(person);
+      return person;
     },
   },
 };
