@@ -18,7 +18,11 @@
   "homepage": "https://github.com/JWCTempleton/graphql-practice#readme",
   "dependencies": {
     "@apollo/server": "^4.5.0",
+    "bcrypt": "^5.1.0",
+    "dotenv": "^16.0.3",
     "graphql": "^16.6.0",
+    "jsonwebtoken": "^9.0.0",
+    "mongoose": "^7.0.3",
     "uuid": "^9.0.0"
   }
 }
