@@ -103,6 +103,9 @@ const typeDefs = `
         username: String!
         password: String!
         ): Token
+    addAsFriend(
+        name: String!
+    ): User
   }
 `;
 
@@ -204,6 +207,9 @@ const typeDefs = `
 //   //   persons = persons.map((p) => (p.name === args.name ? updatedPerson : p));
 //   //   return updatedPerson;
 // };
+
+//resolvers correspond to the queries described in the schema
+//there is a field under Query for every query described in the schema
 const resolvers = {
   Query: {
     personCount: async () => Person.collection.countDocuments(),
@@ -230,6 +236,8 @@ const resolvers = {
     },
   },
 
+  //mutation adds the object given to it as a parameter args
+  //to the array persons, and returns the object it added to the array
   Mutation: {
     addPerson: async (root, args, context) => {
       const person = new Person({ ...args });
@@ -324,6 +332,28 @@ const resolvers = {
       };
 
       return { value: jwt.sign(userForToken, process.env.SECRET) };
+    },
+
+    addAsFriend: async (root, args, { currentUser }) => {
+      const isFriend = (person) =>
+        currentUser.friends
+          .map((friend) => friend._id.toString())
+          .includes(person._id.toString());
+
+      if (!currentUser) {
+        throw new GraphQLError("wrong credentials", {
+          extensions: { code: "BAD_USER_INPUT" },
+        });
+      }
+
+      const person = await Person.findOne({ name: args.name });
+      if (!isFriend(person)) {
+        currentUser.friends = currentUser.friends.concat(person);
+      }
+
+      await currentUser.save();
+
+      return currentUser;
     },
   },
 };
