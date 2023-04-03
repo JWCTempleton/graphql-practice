@@ -1,6 +1,6 @@
 const { ApolloServer } = require("@apollo/server");
 const { startStandaloneServer } = require("@apollo/server/standalone");
-const { GraphQLError } = require("graphql");
+const { GraphQLError, graphql } = require("graphql");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
@@ -231,10 +231,23 @@ const resolvers = {
   },
 
   Mutation: {
-    addPerson: async (root, args) => {
+    addPerson: async (root, args, context) => {
       const person = new Person({ ...args });
+      const currentUser = context.currentUser;
+
+      // a person can't be added if there isn't an authenticated user logged in
+      if (!currentUser) {
+        throw new GraphQLError("Not authenticated", {
+          extensions: {
+            code: "BAD_USER_INPUT",
+          },
+        });
+      }
+
       try {
         await person.save();
+        currentUser.friends = currentUser.friends.concat(person);
+        await currentUser.save();
       } catch (error) {
         throw new GraphQLError("Saving user failed", {
           extensions: {
