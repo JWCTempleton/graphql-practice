@@ -61,6 +61,7 @@ const typeDefs = `
     id: ID!
   }
 
+
   type User {
     username: String!
     password: String!
