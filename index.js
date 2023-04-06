@@ -10,7 +10,6 @@ const cors = require("cors");
 const http = require("http");
 
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
 
 const mongoose = require("mongoose");
 mongoose.set("strictQuery", false);
