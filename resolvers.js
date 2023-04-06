@@ -1,4 +1,7 @@
 const { GraphQLError } = require("graphql");
+const { PubSub } = require("graphql-subscriptions");
+
+const pubsub = new PubSub();
 const jwt = require("jsonwebtoken");
 const Person = require("./models/person");
 const User = require("./models/user");
@@ -60,8 +63,10 @@ const resolvers = {
         });
       }
 
+      pubsub.publish("PERSON_ADDED", { personAdded: person });
       return person;
     },
+
     editNumber: async (root, args) => {
       const person = await Person.findOne({ name: args.name });
       person.phone = args.phone;
@@ -148,6 +153,11 @@ const resolvers = {
       await currentUser.save();
 
       return currentUser;
+    },
+  },
+  Subscription: {
+    personAdded: {
+      subscribe: () => pubsub.asyncIterator("PERSON_ADDED"),
     },
   },
 };

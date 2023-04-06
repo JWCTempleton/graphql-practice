@@ -6,7 +6,6 @@ const {
 const { makeExecutableSchema } = require("@graphql-tools/schema");
 const { WebSocketServer } = require("ws");
 const { useServer } = require("graphql-ws/lib/use/ws");
-const { GraphQLError, graphql } = require("graphql");
 const express = require("express");
 const cors = require("cors");
 const http = require("http");
